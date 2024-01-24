@@ -1,6 +1,7 @@
 package com.aicontent.globalInsightApp
 
 import android.graphics.Region
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -10,10 +11,13 @@ import com.aicontent.globalInsightApp.entity.modelAll.entity
 import com.aicontent.globalInsightApp.entity.modelAll.entityItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.log
 
 sealed class ApiState<out T> {
     object Loading : ApiState<Nothing>()
@@ -33,7 +37,8 @@ class MainViewModel @Inject constructor(private val apiService: ApiService) : Vi
     private val _listCountry = mutableStateOf<ApiState<entity>>(ApiState.Loading)
     val listCountry: State<ApiState<entity>> = _listCountry
 
-    private val _listCountryByRegion = mutableStateOf<ApiStateRegion<List<String>>>(ApiStateRegion.Loading)
+    private val _listCountryByRegion =
+        mutableStateOf<ApiStateRegion<List<String>>>(ApiStateRegion.Loading)
     val listCountryByRegion: State<ApiStateRegion<List<String>>> = _listCountryByRegion
 
     private val _selectedCountry = MutableStateFlow<entityItem?>(null)
@@ -48,13 +53,19 @@ class MainViewModel @Inject constructor(private val apiService: ApiService) : Vi
             try {
                 val response = apiService.getAllCountry()
                 _listCountry.value = ApiState.Success(response)
+
             } catch (e: Exception) {
+                println("Exception: ${e.javaClass.simpleName}, Message: ${e.message}")
+                Log.d(
+                    "flow exception",
+                    "Exception: ${e.javaClass.simpleName}, Message: ${e.message}"
+                )
                 _listCountry.value = ApiState.Error("Failed to fetch data")
             }
         }
     }
 
-     fun fetchCountryByRegion() {
+    fun fetchCountryByRegion() {
         viewModelScope.launch {
             try {
                 val response = apiService.getCountryByRegion(field = "region")

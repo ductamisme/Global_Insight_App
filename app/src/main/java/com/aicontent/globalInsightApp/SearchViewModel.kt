@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.aicontent.globalInsightApp.data.ApiService
 import com.aicontent.globalInsightApp.entity.modelAll.entity
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -23,7 +24,6 @@ sealed class ApiStateSearch<out T> {
 class SearchViewModel @Inject constructor(private val apiService: ApiService): ViewModel() {
     private val _country = mutableStateOf<ApiStateSearch<entity>>(ApiStateSearch.Loading)
     val country: State<ApiStateSearch<entity>> = _country
-
     var textSearch by mutableStateOf("")
         private set
 
@@ -39,12 +39,15 @@ class SearchViewModel @Inject constructor(private val apiService: ApiService): V
         viewModelScope.launch {
             try {
                 if (textSearch == "" || textSearch.isEmpty() || textSearch.isBlank()){
+//                    delay(1000)
                     _country.value = ApiStateSearch.Warning("please fill the search name!")
                 } else {
+//                    delay(1000)
                     val response = apiService.getCountryByName(textSearch)
                     _country.value = ApiStateSearch.Success(response)
                 }
             } catch (e: Exception) {
+//                delay(1000)
                 _country.value = ApiStateSearch.Error("We can not find your country (' '/) ")
             }
         }

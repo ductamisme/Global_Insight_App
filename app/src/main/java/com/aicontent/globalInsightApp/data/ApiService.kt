@@ -2,6 +2,7 @@ package com.aicontent.globalInsightApp.data
 
 import android.graphics.Region
 import com.aicontent.globalInsightApp.entity.modelAll.entity
+import kotlinx.coroutines.flow.Flow
 import retrofit2.http.GET
 import retrofit2.http.Path
 
